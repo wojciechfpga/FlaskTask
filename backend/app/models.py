@@ -15,5 +15,5 @@ class Reservation(db.Model):
     room_id = db.Column(db.Integer, db.ForeignKey("rooms.id"), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
-
+    is_deleted = db.Column(db.Boolean, default=False)  # Soft delete
     room = db.relationship("Room", backref="reservations")
