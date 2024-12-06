@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from app import db
+#db = SQLAlchemy()
 
 class Room(db.Model):
     __tablename__ = "rooms"
