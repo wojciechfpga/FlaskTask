@@ -4,7 +4,7 @@ from app.models import Reservation, db, Room
 from app.services.room_service import is_time_conflict
 from app.commands.reservation_commands import CreateReservationCommand, SoftDeleteReservationCommand
 from app.queries.reservation_queries import ReservationQueries
-from app.auth.middleware import AuthorizationMiddleware
+from app.auth.middleware import AuthorizationMiddleware, role_required
 from app.commands.auth_commands import LoginUserCommand, RegisterUserCommand
 
 bp = Blueprint('room', __name__)
@@ -116,3 +116,32 @@ def login():
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": "An unexpected error occurred"}), 500
+
+@bp_reservation.route('/reservations/all', methods=['GET'])
+@role_required("admin")
+def get_all_reservations(user_id):
+    """
+    All reservations - admins only
+    """
+    reservations = db.session.query(Reservation).filter_by(is_deleted=False).all()
+    return jsonify([{
+        "id": r.id,
+        "room_id": r.room_id,
+        "user_id": r.user_id,
+        "start_time": r.start_time.isoformat(),
+        "end_time": r.end_time.isoformat()
+    } for r in reservations])
+
+@bp_reservation.route('/reservations/my', methods=['GET'])
+@AuthorizationMiddleware.token_required
+def get_my_reservations(user_id,role):
+    """
+    Pobieranie rezerwacji zalogowanego użytkownika.
+    """
+    reservations = db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
+    return jsonify([{
+        "id": r.id,
+        "room_id": r.room_id,
+        "start_time": r.start_time.isoformat(),
+        "end_time": r.end_time.isoformat()
+    } for r in reservations])
