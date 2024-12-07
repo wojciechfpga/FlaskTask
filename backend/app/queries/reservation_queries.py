@@ -1,4 +1,3 @@
-from datetime import datetime
 from app.models import db, Reservation
 
 class ReservationQueries:
@@ -16,12 +15,18 @@ class ReservationQueries:
         if end_time:
             query = query.filter(Reservation.start_time < end_time)
 
-        # Ograniczenie liczby zwracanych wyników
         return query.order_by(Reservation.start_time).limit(100).all()
+
+    @staticmethod
+    def get_reservations_by_user_id(user_id):
+        """
+        Pobiera wszystkie aktywne rezerwacje dla danego użytkownika.
+        """
+        return db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
 
     @staticmethod
     def get_reservation_by_id(reservation_id):
         """
-        Downloading one reservation based on ID
+        Pobiera jedną rezerwację na podstawie ID.
         """
         return db.session.query(Reservation).filter_by(id=reservation_id, is_deleted=False).first()

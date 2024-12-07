@@ -58,7 +58,7 @@ def get_all_reservations(user_id):
     """
     All reservations - admins only
     """
-    reservations = db.session.query(Reservation).filter_by(is_deleted=False).all()
+    reservations = ReservationQueries.get_reservations()
     return jsonify([{
         "id": r.id,
         "room_id": r.room_id,
@@ -73,7 +73,7 @@ def get_my_reservations(user_id):
     """
     Pobieranie rezerwacji zalogowanego użytkownika.
     """
-    reservations = db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
+    reservations = ReservationQueries.get_reservations_by_user_id(user_id)
     return jsonify([{
         "id": r.id,
         "room_id": r.room_id,
