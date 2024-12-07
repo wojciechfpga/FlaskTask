@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.commands.reservation_commands import CreateReservationCommand, SoftDeleteReservationCommand
 from app.queries.reservation_queries import ReservationQueries
-from app.auth.middleware import AuthorizationMiddleware, role_required
+from app.auth.middleware import authorization_jwt
 from datetime import datetime
 
 from app import db
@@ -10,7 +10,7 @@ from app.models import Reservation
 bp = Blueprint('reservation', __name__)
 
 @bp.route('/reservations', methods=['POST'])
-@AuthorizationMiddleware.token_required
+@authorization_jwt("employee")
 def create_reservation(user_id):
     data = request.get_json()
     try:
@@ -51,7 +51,7 @@ def delete_reservation(reservation_id):
 
     
 @bp.route('/reservations/all', methods=['GET'])
-@role_required("admin")
+@authorization_jwt("admin")
 def get_all_reservations(user_id):
     """
     All reservations - admins only
@@ -66,7 +66,7 @@ def get_all_reservations(user_id):
     } for r in reservations])
 
 @bp.route('/reservations/my', methods=['GET'])
-@AuthorizationMiddleware.token_required
+@authorization_jwt("employee","admin")
 def get_my_reservations(user_id):
     """
     Pobieranie rezerwacji zalogowanego użytkownika.

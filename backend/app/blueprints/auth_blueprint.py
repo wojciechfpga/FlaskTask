@@ -10,7 +10,7 @@ def register():
         user_id = RegisterUserCommand.execute(
             username=data['username'], 
             password=data['password'], 
-            role=data.get('role', 'employee')
+            role='employee'
         )
         return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
     except ValueError as e:

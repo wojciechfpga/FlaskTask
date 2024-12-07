@@ -11,7 +11,7 @@ import flask_monitoringdashboard as dashboard
 
 class RegisterUserCommand:
     @staticmethod
-    def execute(username, password, role="employee"):
+    def execute(username, password, role):
         """
         Register a new user with a hashed password.
         """
