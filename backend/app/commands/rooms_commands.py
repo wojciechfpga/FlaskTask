@@ -63,4 +63,27 @@ class UpdateRoomCommand:
             current_app.logger.error(f"Error updating room: {e}")
             abort(500, description="Error updating room")
 
+class DeleteRoomCommand:
+    @staticmethod
+    def execute(room_id):
+        """
+        Delete a room with the given room_id.
+        """
+        try:
+            room = Room.query.get(room_id)
+            if not room:
+                raise ValueError("Room not found.")
+
+            db.session.delete(room)
+            db.session.commit()
+
+            return {"message": "Room deleted successfully."}
+
+        except ValueError as ve:
+            current_app.logger.info(ve)
+            abort(404, description=str(ve))
+
+        except Exception as e:
+            current_app.logger.error(f"Error deleting room: {e}")
+            abort(500, description="Error deleting room")
 

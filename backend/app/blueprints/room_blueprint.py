@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from app.commands.rooms_commands import CreateRoomCommand, UpdateRoomCommand
+from app.commands.rooms_commands import CreateRoomCommand, DeleteRoomCommand, UpdateRoomCommand
 from app.queries.rooms_queries import GetRoomsQuery
 from app.auth.middleware import authorization_jwt
 
@@ -31,3 +31,11 @@ def update_room(user_id,room_id):
         is_active=data.get('is_active')
     )
     return jsonify({"message": "Room updated successfully"}), 200
+
+@bp.route('/rooms/<int:room_id>', methods=['DELETE'])
+@authorization_jwt("admin")
+def delete_room(user_id,room_id):
+    DeleteRoomCommand.execute(
+        room_id=room_id
+    )
+    return jsonify({"message": "Room deleted successfully"}), 200
