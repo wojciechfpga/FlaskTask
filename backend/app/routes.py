@@ -27,12 +27,11 @@ def create_room():
 
 @bp_reservation.route('/reservations', methods=['POST'])
 @AuthorizationMiddleware.token_required
-def create_reservation(user_id, role):
+def create_reservation(user_id):
     """
     Creating new reservation
     """
-    if role != "admin":
-        return jsonify({"error": "Permission denied"}), 403
+
     data = request.get_json()
     try:
         reservation_id = CreateReservationCommand.execute(
@@ -91,7 +90,7 @@ def register():
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
-        role = data.get('role', 'employee')
+        role = "employee" #data.get('role', 'employee')
 
         user_id = RegisterUserCommand.execute(username, password, role)
         return jsonify({"message": "User registered successfully", "user_id": user_id}), 201

@@ -17,7 +17,7 @@ class AuthorizationMiddleware:
             try:
                 data = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])
                 kwargs['user_id'] = data["user_id"]
-                kwargs['role'] = data["role"]
+                #kwargs['role'] = data["role"]
             except jwt.ExpiredSignatureError:
                 return jsonify({"error": "Token has expired"}), 401
             except jwt.InvalidTokenError:
