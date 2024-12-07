@@ -33,14 +33,18 @@ class LoginUserCommand:
         Authenticate user and generate JWT token if credentials are valid.
         """
         user = db.session.query(User).filter_by(username=username).first()
+
         if not user or not user.check_password(password):
             raise ValueError("Invalid username or password")
-
-        # Generate JWT token
-        token = jwt.encode(
-            {"user_id": user.id, "role": user.role, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
-            current_app.config["SECRET_KEY"],
-            algorithm="HS256"
-        )
-
-        return token
+ 
+       
+        try:
+            token = jwt.encode(
+                {"user_id": user.id, "role": user.role, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
+                current_app.config["SECRET_KEY"],
+                algorithm="HS256"
+            )            
+            return token
+        except Exception as e:
+            my=str(e)
+            return my

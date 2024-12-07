@@ -81,6 +81,7 @@ def register():
     """
     Endpoint to register of user
     """
+    print('Begin of register')
     try:
         data = request.get_json()
         username = data.get('username')
@@ -104,7 +105,7 @@ def login():
         username = data.get('username')
         password = data.get('password')
 
-        token = LoginUserCommand.execute(username, password)
+        token =LoginUserCommand.execute(username, password)
         return jsonify({"message": "Login successful", "token": token}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
