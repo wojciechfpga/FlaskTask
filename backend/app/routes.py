@@ -4,9 +4,12 @@ from app.models import Reservation, db, Room
 from app.services.room_service import is_time_conflict
 from app.commands.reservation_commands import CreateReservationCommand, SoftDeleteReservationCommand
 from app.queries.reservation_queries import ReservationQueries
+from app.auth.middleware import AuthorizationMiddleware
+from app.commands.auth_commands import LoginUserCommand, RegisterUserCommand
 
 bp = Blueprint('room', __name__)
 bp_reservation = Blueprint('reservation', __name__)
+bp_auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/rooms', methods=['GET'])
 def get_rooms():
@@ -23,6 +26,7 @@ def create_room():
 
 
 @bp_reservation.route('/reservations', methods=['POST'])
+@AuthorizationMiddleware.token_required
 def create_reservation():
     """
     Tworzenie nowej rezerwacji.
@@ -71,3 +75,38 @@ def delete_reservation(reservation_id):
         return jsonify({"message": "Reservation deleted"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 404
+    
+@bp_auth.route('/register', methods=['POST'])
+def register():
+    """
+    Endpoint to register of user
+    """
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        role = data.get('role', 'employee')
+
+        user_id = RegisterUserCommand.execute(username, password, role)
+        return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred"}), 500
+
+@bp_auth.route('/login', methods=['POST'])
+def login():
+    """
+    Endpoint to login of user
+    """
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        token = LoginUserCommand.execute(username, password)
+        return jsonify({"message": "Login successful", "token": token}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred"}), 500

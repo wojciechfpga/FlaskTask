@@ -6,7 +6,7 @@ def initialize_database():
     Funkcja do inicjalizacji bazy danych.
     Tworzy wszystkie tabele na podstawie modeli.
     """
-    #db.drop_all()
+    db.drop_all()
     db.create_all()
     print("Baza danych została zainicjalizowana!")
 
