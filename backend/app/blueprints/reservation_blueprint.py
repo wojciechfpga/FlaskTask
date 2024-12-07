@@ -46,11 +46,9 @@ def get_reservations():
 
 @bp.route('reservations/<int:reservation_id>', methods=['DELETE'])
 def delete_reservation(reservation_id):
-    try:
-        SoftDeleteReservationCommand.execute(reservation_id)
-        return jsonify({"message": "Reservation deleted"}), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 404
+    SoftDeleteReservationCommand.execute(reservation_id)
+    return jsonify({"message": "Reservation deleted"}), 200
+
     
 @bp.route('/reservations/all', methods=['GET'])
 @role_required("admin")
