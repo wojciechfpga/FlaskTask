@@ -3,12 +3,12 @@ from app.models import Room, db
 
 bp = Blueprint('room', __name__)
 
-@bp.route('/', methods=['GET'])
+@bp.route('/rooms', methods=['GET'])
 def get_rooms():
     rooms = Room.query.all()
     return jsonify([{"id": room.id, "name": room.name, "capacity": room.capacity} for room in rooms])
 
-@bp.route('/', methods=['POST'])
+@bp.route('/rooms', methods=['POST'])
 def create_room():
     data = request.get_json()
     room = Room(name=data['name'], capacity=data['capacity'])
