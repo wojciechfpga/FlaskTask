@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 from config import Config
+import flask_monitoringdashboard as dashboard
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -10,6 +11,7 @@ migrate = Migrate()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    dashboard.config.init_from(file='../config.cfg')
 
     # Inicjalizacja bazy danych
     db.init_app(app)
@@ -42,4 +44,5 @@ def create_app():
             from app.db import initialize_database
             initialize_database()
 
+    dashboard.bind(app)
     return app

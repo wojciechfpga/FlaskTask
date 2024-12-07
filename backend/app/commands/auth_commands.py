@@ -1,8 +1,11 @@
 from app.models import db, User
 import jwt
 import datetime
-from flask import current_app
+from flask import current_app,abort
 from app.models import User
+
+from flask import jsonify
+import flask_monitoringdashboard as dashboard
 
 class RegisterUserCommand:
     @staticmethod
@@ -10,19 +13,29 @@ class RegisterUserCommand:
         """
         Register a new user with a hashed password.
         """
-        if not username or not password:
-            raise ValueError("Username and password are required")
+        try:
+            if not username or not password:
+                raise ValueError("Username and password are required")
 
-        existing_user = db.session.query(User).filter_by(username=username).first()
-        if existing_user:
-            raise ValueError("Username already exists")
+            existing_user = db.session.query(User).filter_by(username=username).first()
+            if existing_user:
+                raise ValueError("Username already exists")
 
-        user = User(username=username, role=role)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
+            user = User(username=username, role=role)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
 
-        return user.id
+            return user.id
+        except ValueError as ve:
+            dashboard.log(ve)
+            abort(409, description=str(ve)) 
+        except Exception as e:
+            dashboard.log(e)
+            abort(500, description="Some Error...") 
+        finally:
+            print("User registration attempt logged")
+
 
 
 
@@ -32,19 +45,24 @@ class LoginUserCommand:
         """
         Authenticate user and generate JWT token if credentials are valid.
         """
-        user = db.session.query(User).filter_by(username=username).first()
-
-        if not user or not user.check_password(password):
-            raise ValueError("Invalid username or password")
- 
-       
         try:
+            user = db.session.query(User).filter_by(username=username).first()
+
+            if not user or not user.check_password(password):
+                raise ValueError("Invalid username or password")
+
             token = jwt.encode(
                 {"user_id": user.id, "role": user.role, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
                 current_app.config["SECRET_KEY"],
                 algorithm="HS256"
-            )            
+            )
             return token
+        except ValueError as ve:
+            dashboard.log(ve)
+            abort(403, description=str(ve)) 
         except Exception as e:
-            my=str(e)
-            return my
+            dashboard.log(e)
+            abort(500, description="Some error occured. Try later") 
+        finally:
+            print("Login attempt logged")
+
