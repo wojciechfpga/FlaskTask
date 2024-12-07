@@ -15,10 +15,12 @@ def create_app():
     db.init_app(app)
 
     # Rejestracja blueprintów
-    from app.routes import bp as room_blueprint, bp_reservation, bp_auth
-    app.register_blueprint(room_blueprint, url_prefix='/api')
-    app.register_blueprint(bp_reservation, url_prefix="/api")
-    app.register_blueprint(bp_auth, url_prefix="/api")
+    from app.blueprints.room_blueprint import bp as room_bp
+    from app.blueprints.reservation_blueprint import bp as reservation_bp
+    from app.blueprints.auth_blueprint import bp as auth_bp
+    app.register_blueprint(room_bp, url_prefix='/api')
+    app.register_blueprint(reservation_bp, url_prefix="/api")
+    app.register_blueprint(auth_bp, url_prefix="/api")
 
     # Swagger UI
     SWAGGER_URL = '/swagger'
