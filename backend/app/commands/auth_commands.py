@@ -7,6 +7,8 @@ from app.models import User
 from flask import jsonify
 import flask_monitoringdashboard as dashboard
 
+#from app import app
+
 class RegisterUserCommand:
     @staticmethod
     def execute(username, password, role="employee"):
@@ -28,10 +30,10 @@ class RegisterUserCommand:
 
             return user.id
         except ValueError as ve:
-            dashboard.log(ve)
+            current_app.logger.info(ve)
             abort(409, description=str(ve)) 
         except Exception as e:
-            dashboard.log(e)
+            current_app.logger.info(e)
             abort(500, description="Some Error...") 
         finally:
             print("User registration attempt logged")
@@ -58,10 +60,10 @@ class LoginUserCommand:
             )
             return token
         except ValueError as ve:
-            dashboard.log(ve)
+            current_app.logger.info(ve)
             abort(403, description=str(ve)) 
         except Exception as e:
-            dashboard.log(e)
+            current_app.logger.info(e)
             abort(500, description="Some error occured. Try later") 
         finally:
             print("Login attempt logged")
