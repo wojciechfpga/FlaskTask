@@ -2,9 +2,11 @@ from datetime import datetime
 from app.models import db, Reservation
 from app.services.room_service import is_time_conflict
 
+from app.models import db, Reservation
+
 class CreateReservationCommand:
     @staticmethod
-    def execute(room_id, start_time, end_time):
+    def execute(room_id, user_id, start_time, end_time):
         """
         Creating new reservation without any conflict
         """
@@ -16,12 +18,14 @@ class CreateReservationCommand:
 
         reservation = Reservation(
             room_id=room_id,
+            user_id=user_id,  # Dodano user_id
             start_time=start_time,
             end_time=end_time
         )
         db.session.add(reservation)
         db.session.commit()
         return reservation.id
+
 
 class SoftDeleteReservationCommand:
     @staticmethod

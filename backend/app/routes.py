@@ -29,7 +29,7 @@ def create_room():
 @AuthorizationMiddleware.token_required
 def create_reservation(user_id, role):
     """
-    Tworzenie nowej rezerwacji.
+    Creating new reservation
     """
     if role != "admin":
         return jsonify({"error": "Permission denied"}), 403
@@ -37,12 +37,15 @@ def create_reservation(user_id, role):
     try:
         reservation_id = CreateReservationCommand.execute(
             room_id=data.get("room_id"),
+            user_id=user_id,  # Przekazanie user_id
             start_time=datetime.fromisoformat(data.get("start_time")),
             end_time=datetime.fromisoformat(data.get("end_time"))
         )
         return jsonify({"message": "Reservation created", "id": reservation_id}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+
+
 
 @bp_reservation.route('/reservations', methods=['GET'])
 def get_reservations():
