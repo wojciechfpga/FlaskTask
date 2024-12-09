@@ -24,6 +24,6 @@ def login():
             username=data['username'], 
             password=data['password']
         )
-        return jsonify({"message": "Login successful", "token": token}), 200
+        return jsonify({"user": data['username'], "token": token}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

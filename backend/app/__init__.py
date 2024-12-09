@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 from pymongo import MongoClient
+from flask_cors import CORS  # Importuj Flask-CORS
 import logging
 from config import Config
 import flask_monitoringdashboard as dashboard
@@ -31,6 +32,9 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     dashboard.config.init_from(file='../config.cfg')
+
+    # Dodaj CORS do aplikacji
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
     # Inicjalizacja bazy danych
     db.init_app(app)

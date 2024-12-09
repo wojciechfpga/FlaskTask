@@ -7,3 +7,4 @@ pyjwt
 flask-swagger-ui
 flask_monitoringdashboard
 pymongo
+flask-cors
