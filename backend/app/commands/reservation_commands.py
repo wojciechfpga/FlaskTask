@@ -18,7 +18,7 @@ class CreateReservationCommand:
 
         reservation = Reservation(
             room_id=room_id,
-            user_id=user_id,  # Dodano user_id
+            user_id=user_id,  
             start_time=start_time,
             end_time=end_time
         )

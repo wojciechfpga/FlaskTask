@@ -3,7 +3,7 @@ from datetime import datetime
 
 def is_time_conflict(room_id, start_time, end_time):
     """
-    Sprawdza, czy istnieje konflikt czasowy dla danej sali.
+    Conflict checking
     """
     conflict = db.session.query(Reservation).filter(
         Reservation.room_id == room_id,
