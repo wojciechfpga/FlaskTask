@@ -102,12 +102,67 @@
         }
       }
     },
+    "/api/rooms/{room_id}": {
+      "put": {
+        "summary": "Update a room",
+        "description": "Update room details by ID.",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "Room ID to update."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "example": "Updated Room Name"},
+                "capacity": {"type": "integer", "example": 15},
+                "is_active": {"type": "boolean", "example": true}
+              },
+              "required": []
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Room updated successfully"},
+          "404": {"description": "Room not found"}
+        }
+      },
+      "delete": {
+        "summary": "Delete a room",
+        "description": "Soft-delete a room by ID.",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "Room ID to delete."
+          }
+        ],
+        "responses": {
+          "200": {"description": "Room deleted successfully"},
+          "404": {"description": "Room not found"}
+        }
+      }
+    },
     "/api/reservations/{reservation_id}": {
       "delete": {
         "summary": "Delete a reservation",
         "description": "Soft-delete a reservation by ID.",
         "parameters": [
-          {"name": "reservation_id", "in": "path", "type": "integer", "required": true}
+          {
+            "name": "reservation_id",
+            "in": "path",
+            "type": "integer",
+            "required": true
+          }
         ],
         "responses": {
           "200": {"description": "Reservation deleted successfully"},
