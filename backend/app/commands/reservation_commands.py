@@ -39,3 +39,24 @@ class SoftDeleteReservationCommand:
 
         reservation.is_deleted = True
         db.session.commit()
+class UpdateReservationCommand:
+    @staticmethod
+    def execute(id, room_id,start_time, end_time):
+        """
+        Upadating existing reservation without any conflict
+        """
+        if start_time >= end_time:
+            raise ValueError("Invalid time range")
+
+        if is_time_conflict(room_id, start_time, end_time):
+            raise ValueError("Time conflict for the selected room")
+
+        reservation = db.session.query(Reservation).filter_by(id=id).one()
+        reservation.start_time=start_time
+        reservation.end_time=end_time
+        db.session.commit()
+        return {"id":reservation.id,
+                "start_time":reservation.start_time,
+                "end_time":reservation.end_time,
+                "room_id":reservation.room_id,
+                }

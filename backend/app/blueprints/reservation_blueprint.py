@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.commands.reservation_commands import CreateReservationCommand, SoftDeleteReservationCommand
+from app.commands.reservation_commands import CreateReservationCommand, SoftDeleteReservationCommand, UpdateReservationCommand
 from app.queries.reservation_queries import ReservationQueries
 from app.auth.middleware import authorization_jwt
 from datetime import datetime
@@ -61,3 +61,14 @@ def get_my_reservations(user_id):
         "start_time": r.start_time.isoformat(),
         "end_time": r.end_time.isoformat()
     } for r in reservations])
+
+@bp.route('reservations/<int:reservation_id>', methods=['PATCH'])
+@authorization_jwt("employee","admin")
+def update_reservation(user_id,reservation_id):
+    data = request.get_json()
+    reservation = UpdateReservationCommand.execute(reservation_id,data['room_id'],data['start_time'],data['end_time'])
+    return jsonify({"id": reservation["id"],
+                    "start_time": reservation["start_time"],
+                    "end_time": reservation["end_time"],
+                    "room_id": reservation["room_id"]
+                    }), 200
