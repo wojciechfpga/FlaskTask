@@ -57,6 +57,7 @@ def get_my_reservations(user_id):
     return jsonify([{
         "id": r.id,
         "room_id": r.room_id,
+        "room_name": r.room.name, 
         "start_time": r.start_time.isoformat(),
         "end_time": r.end_time.isoformat()
     } for r in reservations])
