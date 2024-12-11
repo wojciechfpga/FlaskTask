@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask import abort
 from app.models import db, Reservation
 from app.services.room_service import is_time_conflict
 
@@ -39,7 +40,7 @@ class SoftDeleteReservationCommand:
 
         reservation.is_deleted = True
         db.session.commit()
-from flask import abort
+
 
 class UpdateReservationCommand:
     @staticmethod
