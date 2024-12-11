@@ -70,5 +70,6 @@ def update_reservation(user_id,reservation_id):
     return jsonify({"id": reservation["id"],
                     "start_time": reservation["start_time"],
                     "end_time": reservation["end_time"],
-                    "room_id": reservation["room_id"]
+                    "room_id": reservation["room_id"],
+                    "room_name": reservation["room_name"],
                     }), 200

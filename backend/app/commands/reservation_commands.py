@@ -54,9 +54,11 @@ class UpdateReservationCommand:
         reservation = db.session.query(Reservation).filter_by(id=id).one()
         reservation.start_time=start_time
         reservation.end_time=end_time
+
         db.session.commit()
         return {"id":reservation.id,
                 "start_time":reservation.start_time,
                 "end_time":reservation.end_time,
                 "room_id":reservation.room_id,
+                "room_name":reservation.room.name,
                 }
