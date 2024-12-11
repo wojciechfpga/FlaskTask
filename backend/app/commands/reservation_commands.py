@@ -39,26 +39,34 @@ class SoftDeleteReservationCommand:
 
         reservation.is_deleted = True
         db.session.commit()
+from flask import abort
+
 class UpdateReservationCommand:
     @staticmethod
-    def execute(id, room_id,start_time, end_time):
+    def execute(id, room_id, start_time, end_time):
         """
-        Upadating existing reservation without any conflict
+        Updating existing reservation without any conflict
         """
-        if start_time >= end_time:
-            raise ValueError("Invalid time range")
+        try:
+            if start_time >= end_time or is_time_conflict(room_id, start_time, end_time):
+                raise ValueError("Invalid time range or someone already reserved this room for this time")
+                
 
-        if is_time_conflict(room_id, start_time, end_time):
-            raise ValueError("Time conflict for the selected room")
+            reservation = db.session.query(Reservation).filter_by(id=id).one()
+            reservation.start_time = start_time
+            reservation.end_time = end_time
 
-        reservation = db.session.query(Reservation).filter_by(id=id).one()
-        reservation.start_time=start_time
-        reservation.end_time=end_time
+            db.session.commit()
+            return {
+                "id": reservation.id,
+                "start_time": reservation.start_time,
+                "end_time": reservation.end_time,
+                "room_id": reservation.room_id,
+                "room_name": reservation.room.name,
+            }
+        except ValueError as e:
+            abort(409, description=str(e))
+        except Exception as e:
+            db.session.rollback()
+            abort(500, description="Some error..try later")
 
-        db.session.commit()
-        return {"id":reservation.id,
-                "start_time":reservation.start_time,
-                "end_time":reservation.end_time,
-                "room_id":reservation.room_id,
-                "room_name":reservation.room.name,
-                }
