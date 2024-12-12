@@ -8,7 +8,3 @@ def initialize_database():
     db.drop_all()
     db.create_all()
 
-    if not Room.query.first(): 
-        example_room = Room(name="Sala Konferencyjna 1", capacity=10)
-        db.session.add(example_room)
-        db.session.commit()
