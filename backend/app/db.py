@@ -1,18 +1,14 @@
 from app import db
-from app.models import Room  # Importuj modele
+from app.models import Room 
 
 def initialize_database():
     """
-    Funkcja do inicjalizacji bazy danych.
-    Tworzy wszystkie tabele na podstawie modeli.
+    Initialization of DB
     """
     db.drop_all()
     db.create_all()
-    print("Baza danych została zainicjalizowana!")
 
-    # Dodanie przykładowych danych
-    if not Room.query.first():  # Sprawdź, czy tabela jest pusta
+    if not Room.query.first(): 
         example_room = Room(name="Sala Konferencyjna 1", capacity=10)
         db.session.add(example_room)
         db.session.commit()
-        print("Dodano przykładową salę do bazy danych.")

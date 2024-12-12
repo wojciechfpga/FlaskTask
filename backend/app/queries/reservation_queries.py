@@ -4,29 +4,41 @@ class ReservationQueries:
     @staticmethod
     def get_reservations(room_id=None, start_time=None, end_time=None):
         """
-        Pobiera listę aktywnych rezerwacji z optymalizacją zapytań.
+        Retriving list of all reservation
         """
-        query = db.session.query(Reservation).filter(Reservation.is_deleted == False)
+        try:
+            query = db.session.query(Reservation).filter(Reservation.is_deleted == False)
 
-        if room_id:
-            query = query.filter(Reservation.room_id == room_id)
-        if start_time:
-            query = query.filter(Reservation.end_time > start_time)
-        if end_time:
-            query = query.filter(Reservation.start_time < end_time)
+            if room_id:
+                query = query.filter(Reservation.room_id == room_id)
+            if start_time:
+                query = query.filter(Reservation.end_time > start_time)
+            if end_time:
+                query = query.filter(Reservation.start_time < end_time)
 
-        return query.order_by(Reservation.start_time).limit(100).all()
+            return query.order_by(Reservation.start_time).all()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError("An error occurred while fetching reservations") from e
 
     @staticmethod
     def get_reservations_by_user_id(user_id):
         """
-        Pobiera wszystkie aktywne rezerwacje dla danego użytkownika.
+        Retrive all reservertions made by user
         """
-        return db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
+        try:
+            return db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError("An error occurred while fetching reservations by user ID") from e
 
     @staticmethod
     def get_reservation_by_id(reservation_id):
         """
-        Pobiera jedną rezerwację na podstawie ID.
+        Retrive single reservation based on ID.
         """
-        return db.session.query(Reservation).filter_by(id=reservation_id, is_deleted=False).first()
+        try:
+            return db.session.query(Reservation).filter_by(id=reservation_id, is_deleted=False).first()
+        except Exception as e:
+            db.session.rollback()
+            raise RuntimeError("An error occurred while fetching the reservation by ID") from e

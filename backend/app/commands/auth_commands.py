@@ -4,11 +4,6 @@ import datetime
 from flask import current_app,abort
 from app.models import User
 
-from flask import jsonify
-import flask_monitoringdashboard as dashboard
-
-#from app import app
-
 class RegisterUserCommand:
     @staticmethod
     def execute(username, password, role):
