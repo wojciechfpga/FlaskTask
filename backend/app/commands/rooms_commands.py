@@ -41,7 +41,6 @@ class UpdateRoomCommand:
             if not room:
                 raise ValueError("Room not found.")
 
-            # Update room details only if new values are provided
             if name is not None:
                 if Room.query.filter(Room.name == name, Room.id != room_id).first():
                     raise ValueError(f"A room with name '{name}' already exists.")
