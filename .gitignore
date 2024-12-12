@@ -54,4 +54,3 @@ docker-compose.override.yml
 # Environment Variables
 .env
 /backend/flask_monitoringdashboard.db
-/backend/config.cfg
