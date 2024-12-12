@@ -1,6 +1,6 @@
 from backend.app import db
 from backend.app.models import User
-
+from app.constants.errors import ErrorMessages
 class UserQueries:
     @staticmethod
     def get_user_by_id(user_id):
@@ -11,7 +11,7 @@ class UserQueries:
             return db.session.query(User).filter_by(id=user_id).first()
         except Exception as e:
             db.session.rollback()
-            raise RuntimeError("An error occurred while fetching the user by ID") from e
+            raise RuntimeError(ErrorMessages.SERVER_ERROR) from e
 
     @staticmethod
     def get_all_users():
@@ -22,4 +22,4 @@ class UserQueries:
             return db.session.query(User).all()
         except Exception as e:
             db.session.rollback()
-            raise RuntimeError("An error occurred while fetching all users") from e
+            raise RuntimeError(ErrorMessages.SERVER_ERROR) from e

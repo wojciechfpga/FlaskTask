@@ -1,8 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from app import db
 from sqlalchemy import Index
 from werkzeug.security import generate_password_hash, check_password_hash
-#db = SQLAlchemy()
 
 class Room(db.Model):
     __tablename__ = "rooms"
@@ -27,8 +25,6 @@ class Reservation(db.Model):
         Index('idx_room_id', 'room_id'),
         Index('idx_reservation_time', 'start_time', 'end_time'),
     )
-
-
 
 
 class User(db.Model):

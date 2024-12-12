@@ -1,7 +1,7 @@
 from flask import abort, current_app
 from app.models import Room,db
-
-
+from app.constants.errors import ErrorMessages
+from app.constants.infos import InfoMessages
 class CreateRoomCommand:
     @staticmethod
     def execute(name, capacity):
@@ -11,7 +11,7 @@ class CreateRoomCommand:
         try:
             existing_room = Room.query.filter_by(name=name).first()
             if existing_room:
-                raise ValueError(f"A room with this name already exists.")
+                raise ValueError(ErrorMessages.ROOM_EXIST)
 
             room = Room(name=name, capacity=capacity)
             db.session.add(room)
@@ -23,12 +23,9 @@ class CreateRoomCommand:
             abort(409, description=str(ve))
         
         except Exception as e:
-            current_app.logger.error(f"Error creating room: {e}")
-            abort(500, description="Error creating room") 
+            current_app.logger.error(f"{ErrorMessages.F_STRING_ERROR}: {e}")
+            abort(500, description=ErrorMessages.SERVER_ERROR) 
         
-        finally:
-            print("Create room operation attempt logged")
-
 
 class UpdateRoomCommand:
     @staticmethod
@@ -39,11 +36,11 @@ class UpdateRoomCommand:
         try:
             room = Room.query.get(room_id)
             if not room:
-                raise ValueError("Room not found.")
+                raise ValueError(ErrorMessages.ROOM_NOT_FOUND)
 
             if name is not None:
                 if Room.query.filter(Room.name == name, Room.id != room_id).first():
-                    raise ValueError(f"A room with name '{name}' already exists.")
+                    raise ValueError(ErrorMessages.ROOM_EXIST)
                 room.name = name
 
             if capacity is not None:
@@ -59,8 +56,8 @@ class UpdateRoomCommand:
             abort(400, description=str(ve))
 
         except Exception as e:
-            current_app.logger.error(f"Error updating room: {e}")
-            abort(500, description="Error updating room")
+            current_app.logger.error(f"{ErrorMessages.F_STRING_ERROR}: {e}")
+            abort(500, description=ErrorMessages.SERVER_ERROR)
 
 class DeleteRoomCommand:
     @staticmethod
@@ -71,18 +68,18 @@ class DeleteRoomCommand:
         try:
             room = Room.query.get(room_id)
             if not room:
-                raise ValueError("Room not found.")
+                raise ValueError(ErrorMessages.ROOM_NOT_FOUND)
 
             db.session.delete(room)
             db.session.commit()
 
-            return {"message": "Room deleted successfully."}
+            return {"message": InfoMessages.ROOM_OPERATION_PASS}
 
         except ValueError as ve:
             current_app.logger.info(ve)
             abort(404, description=str(ve))
 
         except Exception as e:
-            current_app.logger.error(f"Error deleting room: {e}")
-            abort(500, description="Error deleting room")
+            current_app.logger.error(f"{ErrorMessages.F_STRING_ERROR}: {e}")
+            abort(500, description=ErrorMessages.SERVER_ERROR)
 

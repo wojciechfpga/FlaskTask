@@ -1,28 +1,33 @@
-from flask import Blueprint, jsonify, request
-
+from flask import Blueprint, jsonify, request,current_app
+from app.constants.logs import LogMessages
 from app.commands.rooms_commands import CreateRoomCommand, DeleteRoomCommand, UpdateRoomCommand
 from app.queries.rooms_queries import GetRoomsQuery
 from app.auth.middleware import authorization_jwt
+from app.constants.routes import Routes
+from app.constants.infos import InfoMessages
+from app.constants.roles import Roles
 
+bp = Blueprint(Routes.ROOM_BLUEPRINT, __name__)
 
-bp = Blueprint('room', __name__)
-
-@bp.route('/rooms', methods=['GET'])
+@bp.route(Routes.ROOMS, methods=['GET'])
 def get_rooms():
     rooms = GetRoomsQuery.execute()
     return jsonify(rooms)
 
 
-@bp.route('/rooms', methods=['POST'])
-@authorization_jwt("admin")
+@bp.route(Routes.ROOMS, methods=['POST'])
+@authorization_jwt(Roles.ADMIN)
 def create_room(user_id):
+    current_app.logger.info(LogMessages.USER_ENTERED_INTO.format(user_id=user_id,endpoint_name=request.endpoint))
     data = request.get_json()
     room_id = CreateRoomCommand.execute(name=data['name'], capacity=data['capacity'])
-    return jsonify({"message": "Room created successfully", "id": room_id}), 201
+    current_app.logger.info(LogMessages.ROOM_CREATED.format(room_name=data['name']))
+    return jsonify({"message": InfoMessages.ROOM_OPERATION_PASS, "id": room_id}), 201
 
-@bp.route('/rooms/<int:room_id>', methods=['PUT'])
-@authorization_jwt("admin")
+@bp.route(f'/{Routes.ROOMS}/<int:room_id>', methods=['PUT'])
+@authorization_jwt(Roles.ADMIN)
 def update_room(user_id,room_id):
+    current_app.logger.info(LogMessages.USER_ENTERED_INTO.format(user_id=user_id,endpoint_name=request.endpoint))
     data = request.get_json()
     UpdateRoomCommand.execute(
         room_id=room_id, 
@@ -30,12 +35,13 @@ def update_room(user_id,room_id):
         capacity=data.get('capacity'), 
         is_active=data.get('is_active')
     )
-    return jsonify({"message": "Room updated successfully"}), 200
+    return jsonify({"message": InfoMessages.ROOM_OPERATION_PASS}), 200
 
-@bp.route('/rooms/<int:room_id>', methods=['DELETE'])
-@authorization_jwt("admin")
+@bp.route(f'/{Routes.ROOMS}/<int:room_id>', methods=['DELETE'])
+@authorization_jwt(Roles.ADMIN)
 def delete_room(user_id,room_id):
+    current_app.logger.info(LogMessages.USER_ENTERED_INTO.format(user_id=user_id,endpoint_name=request.endpoint))
     DeleteRoomCommand.execute(
         room_id=room_id
     )
-    return jsonify({"message": "Room deleted successfully"}), 200
+    return jsonify({"message": InfoMessages.ROOM_OPERATION_PASS}), 200

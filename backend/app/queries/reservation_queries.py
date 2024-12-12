@@ -1,4 +1,5 @@
 from app.models import db, Reservation
+from app.constants.errors import ErrorMessages
 
 class ReservationQueries:
     @staticmethod
@@ -19,7 +20,7 @@ class ReservationQueries:
             return query.order_by(Reservation.start_time).all()
         except Exception as e:
             db.session.rollback()
-            raise RuntimeError("An error occurred while fetching reservations") from e
+            raise RuntimeError(ErrorMessages.SERVER_ERROR) from e
 
     @staticmethod
     def get_reservations_by_user_id(user_id):
@@ -30,7 +31,7 @@ class ReservationQueries:
             return db.session.query(Reservation).filter_by(user_id=user_id, is_deleted=False).all()
         except Exception as e:
             db.session.rollback()
-            raise RuntimeError("An error occurred while fetching reservations by user ID") from e
+            raise RuntimeError(ErrorMessages.SERVER_ERROR) from e
 
     @staticmethod
     def get_reservation_by_id(reservation_id):
@@ -41,4 +42,4 @@ class ReservationQueries:
             return db.session.query(Reservation).filter_by(id=reservation_id, is_deleted=False).first()
         except Exception as e:
             db.session.rollback()
-            raise RuntimeError("An error occurred while fetching the reservation by ID") from e
+            raise RuntimeError(ErrorMessages.SERVER_ERROR) from e

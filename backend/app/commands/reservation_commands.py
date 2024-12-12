@@ -1,20 +1,19 @@
-from datetime import datetime
 from flask import abort
 from app.models import db, Reservation
 from app.services.room_service import is_time_conflict
-
+from app.constants.errors import ErrorMessages
 class CreateReservationCommand:
     @staticmethod
-    def execute(room_id, user_id, start_time, end_time):
+    def execute(room_id,user_id,start_time, end_time):
         """
         Creating new reservation without any conflict
         """
         try:
             if start_time >= end_time:
-                raise ValueError("Invalid time range")
+                raise ValueError(ErrorMessages.TIME_NOT_CORRECT)
 
             if is_time_conflict(room_id, start_time, end_time):
-                raise ValueError("Time conflict for the selected room")
+                raise ValueError(ErrorMessages.RESERVATION_CONFLICT)
 
             reservation = Reservation(
                 room_id=room_id,
@@ -30,7 +29,7 @@ class CreateReservationCommand:
             abort(409, description=str(e))
         except Exception as e:
             db.session.rollback()
-            abort(500, description="An error occurred while creating the reservation. Please try again later.")
+            abort(500, description=ErrorMessages.Server)
 
 
 class SoftDeleteReservationCommand:
@@ -42,7 +41,7 @@ class SoftDeleteReservationCommand:
         try:
             reservation = db.session.query(Reservation).filter_by(id=reservation_id).first()
             if not reservation or reservation.is_deleted:
-                raise ValueError("Reservation not found or already deleted")
+                raise ValueError(ErrorMessages.TIME_NOT_CORRECT)
 
             reservation.is_deleted = True
             db.session.commit()
@@ -51,7 +50,7 @@ class SoftDeleteReservationCommand:
             abort(409, description=str(e))
         except Exception as e:
             db.session.rollback()
-            abort(500, description="An error occurred while deleting the reservation. Please try again later.")
+            abort(500, description=ErrorMessages.SERVER_ERROR)
 
 
 class UpdateReservationCommand:
@@ -62,7 +61,7 @@ class UpdateReservationCommand:
         """
         try:
             if start_time >= end_time or is_time_conflict(room_id, start_time, end_time):
-                raise ValueError("Invalid time range or someone already reserved this room for this time")
+                raise ValueError(ErrorMessages.RESERVATION_CONFLICT)
                 
             reservation = db.session.query(Reservation).filter_by(id=id).one()
             reservation.start_time = start_time
@@ -80,4 +79,5 @@ class UpdateReservationCommand:
             abort(409, description=str(e))
         except Exception as e:
             db.session.rollback()
-            abort(500, description="Some error..try later")
+            abort(500, description=ErrorMessages.SERVER_ERROR)
+

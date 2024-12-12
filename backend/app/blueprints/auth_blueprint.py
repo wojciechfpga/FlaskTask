@@ -1,29 +1,25 @@
 from flask import Blueprint, jsonify, request
 from app.commands.auth_commands import LoginUserCommand, RegisterUserCommand
+from app.constants.routes import Routes
+from app.constants.infos import InfoMessages
 
-bp = Blueprint('auth', __name__)
+bp = Blueprint(Routes.AUTH_BLUEPRINT, __name__)
 
-@bp.route('/register', methods=['POST'])
+@bp.route(Routes.REGISTER, methods=['POST'])
 def register():
     data = request.get_json()
-    try:
-        user_id = RegisterUserCommand.execute(
-            username=data['username'], 
-            password=data['password'], 
-            role='employee'
-        )
-        return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    user_id = RegisterUserCommand.execute(
+        username=data['username'], 
+        password=data['password'], 
+        role='employee'
+    )
+    return jsonify({"message": InfoMessages.REGISTER_PASS, "user_id": user_id}), 201
 
-@bp.route('/login', methods=['POST'])
+@bp.route(Routes.LOGIN, methods=['POST'])
 def login():
     data = request.get_json()
-    try:
-        token = LoginUserCommand.execute(
-            username=data['username'], 
-            password=data['password']
-        )
-        return jsonify({"user": data['username'], "token": token}), 200
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    token = LoginUserCommand.execute(
+        username=data['username'], 
+        password=data['password']
+    )
+    return jsonify({"user": data['username'], "token": token}), 200
