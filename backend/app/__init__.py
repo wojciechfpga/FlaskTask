@@ -5,14 +5,13 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from pymongo import MongoClient
 from flask_cors import CORS 
 import logging
-from config import Config
+from app.constants.app_config import AppConfig
 import flask_monitoringdashboard as dashboard
 
 db = SQLAlchemy()
 migrate = Migrate()
 
 class MongoHandler(logging.Handler):
-    """Custom logging handler to write logs to MongoDB."""
     def __init__(self, mongo_uri, database, collection):
         super().__init__()
         client = MongoClient(mongo_uri)
@@ -29,10 +28,11 @@ class MongoHandler(logging.Handler):
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(AppConfig)
+
     dashboard.config.init_from(file='../config.cfg')
 
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+    CORS(app, resources={r"/*": {"origins": AppConfig.CORS_ORIGINS}})
 
     db.init_app(app)
 
@@ -43,16 +43,14 @@ def create_app():
     app.register_blueprint(reservation_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api")
 
-    SWAGGER_URL = '/swagger'
-    API_URL = '/static/swagger.json'
     swaggerui_blueprint = get_swaggerui_blueprint(
-        SWAGGER_URL,
-        API_URL,
+        AppConfig.SWAGGER_URL,
+        AppConfig.API_URL,
         config={
             'app_name': "Conference Room Booking API"
         }
     )
-    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+    app.register_blueprint(swaggerui_blueprint, url_prefix=AppConfig.SWAGGER_URL)
 
     @app.cli.command("init-db")
     def init_db():
@@ -60,8 +58,8 @@ def create_app():
             from app.db import initialize_database
             initialize_database()
 
-    mongo_uri = app.config.get("MONGO_URI", "mongodb://localhost:27017")
-    mongo_handler = MongoHandler(mongo_uri, "logs", "app_logs")
+    mongo_uri = app.config.get("MONGO_URI", AppConfig.MONGO_URI)
+    mongo_handler = MongoHandler(mongo_uri, AppConfig.LOG_DATABASE, AppConfig.LOG_COLLECTION)
     mongo_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     mongo_handler.setFormatter(formatter)
